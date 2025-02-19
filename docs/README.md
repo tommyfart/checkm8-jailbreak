@@ -7,3 +7,5 @@ having a hard time learning C and i want to learn
 Objective-C and Assembly (ARM64) and i dont know
 how to make BootROM and checkm8, kernel exploits
 and i dont know where to learn from so yeah.
+
+# STILL IN DEVELOPMENT
