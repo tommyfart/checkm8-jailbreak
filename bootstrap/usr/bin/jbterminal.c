@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <string.h>
+#include <unistd.h>
 
 char device_info[256] = "No iPhone detected. Connect your device.";
 
@@ -26,6 +27,66 @@ void check_device() {
     }
     pclose(fp);
     snprintf(device_info, sizeof(device_info), "iPhone (%s) detected! (iOS %s)", model, ios_version);
+}
+
+void display_recovery_screen() {
+    clear();
+    printw("┌──────────────────────[version: 0.0.1 beta]────────┐\n");
+    printw("│The iPhone will be put into Recovery Mode         │\n");
+    printw("│to boot into DFU mode. This prevents system       │\n");
+    printw("│corruption. Press [ Start ] to continue.         │\n");
+    printw("└───────────────────────────────────────────────────┘\n");
+    refresh();
+    getch();
+}
+
+void boot_into_recovery() {
+    const char spinner[] = "|/-\\";
+    int i = 0;
+    clear();
+    printw("Booting into recovery mode ");
+    while (i < 10) { // development
+        printw("%c\b", spinner[i % 4]);
+        refresh();
+        usleep(250000);
+        i++;
+    }
+    printw("\nDevice in Recovery Mode. Follow DFU instructions.\n");
+    refresh();
+    sleep(2);
+}
+
+void dfu_mode_instructions() {
+    clear();
+    printw("┌──────────────────────[version: 0.0.1 beta]────────┐\n");
+    printw("│DFU Mode Instructions:                             │\n");
+    printw("│1. Hold Power + Home/Volume Down for 10s.        │\n");
+    printw("│2. Release Power, keep holding Home/Vol Down.    │\n");
+    printw("│3. Wait until DFU mode detected.                  │\n");
+    printw("└───────────────────────────────────────────────────┘\n");
+    refresh();
+    sleep(2);
+}
+
+void start_jailbreak() {
+    clear();
+    printw("┌──────────────────────[version: 0.0.1 beta]────────┐\n");
+    printw("│checkm8                                            │\n");
+    printw("│                                                  │\n");
+    printw("│    Exploiting...                                │\n");
+    printw("│   ┌────────────────────────────────────────┐    │\n");
+    for (int i = 0; i < 30; i++) {
+        printw("│   │ ");
+        for (int j = 0; j < i; j++) printw("█");
+        for (int j = i; j < 30; j++) printw(" ");
+        printw(" │    │\n");
+        refresh();
+        usleep(200000);
+    }
+    printw("│   └────────────────────────────────────────┘    │\n");
+    printw("│ Installing Sileo...                             │\n");
+    refresh();
+    sleep(4);
 }
 
 void display_ui(int selected) {
@@ -63,14 +124,23 @@ int main() {
             selected = !selected; // Toggle selection
         } else if (ch == '\n') {
             if (selected == 0) {
-                printw("\nstarting process...\n");
+                display_recovery_screen();
+                boot_into_recovery();
+                dfu_mode_instructions();
+                start_jailbreak();
+                printw("Your device has been jailbroken! Exiting in 5 seconds...\n");
+                refresh();
+                sleep(5);
                 break;
             } else {
-                printw("\nexiting...\n");
+                printw("\nExiting...\n");
                 endwin();
+                exit(0);
+            }
         }
     }
     
     endwin();
     return 0;
 }
+
